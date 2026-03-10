@@ -10,7 +10,7 @@ const SAFETY_SETTINGS = [
   { category: HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
 ];
 
-async function optimizeImage(base64: string, maxWidth = 768): Promise<string> {
+async function optimizeImage(base64: string, maxWidth = 512): Promise<string> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.src = base64;
@@ -50,8 +50,8 @@ function getAI() {
 
 export async function performVirtualTryOn(userBase64: string, productBase64: string, productName: string): Promise<{ image: string, size: string }> {
   const [optUser, optProduct] = await Promise.all([
-    optimizeImage(userBase64, 768),
-    optimizeImage(productBase64, 768)
+    optimizeImage(userBase64, 512),
+    optimizeImage(productBase64, 512)
   ]);
 
   const ai = getAI();
@@ -83,7 +83,10 @@ export async function performVirtualTryOn(userBase64: string, productBase64: str
         ],
       },
       config: { 
-        imageConfig: { aspectRatio: "3:4" },
+        imageConfig: { 
+          aspectRatio: "3:4",
+          imageSize: "512px"
+        },
         safetySettings: SAFETY_SETTINGS
       }
     });
