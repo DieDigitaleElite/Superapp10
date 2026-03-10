@@ -115,7 +115,9 @@ const App: React.FC = () => {
             </div>
             <div className="flex flex-col md:flex-row gap-3 mt-8 justify-center items-center">
               <button onClick={() => setStep(1)} className="w-full md:w-auto px-10 py-4 bg-white border border-slate-200 rounded-full font-black text-[10px] uppercase text-slate-400 order-2 md:order-1">Zurück</button>
-              <button disabled={!state.userImage} onClick={handleTryOn} className={`w-full md:w-auto px-12 py-4 rounded-full font-black text-lg shadow-xl order-1 md:order-2 ${state.userImage ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-400'}`}>ANPROBE STARTEN ✨</button>
+              <button disabled={!state.userImage || state.isLoading} onClick={handleTryOn} className={`w-full md:w-auto px-12 py-4 rounded-full font-black text-lg shadow-xl order-1 md:order-2 ${state.userImage && !state.isLoading ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-400'}`}>
+                {state.isLoading ? 'BITTE WARTEN...' : 'ANPROBE STARTEN ✨'}
+              </button>
             </div>
           </div>
         )}

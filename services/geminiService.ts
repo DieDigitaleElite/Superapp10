@@ -10,7 +10,7 @@ const SAFETY_SETTINGS = [
   { category: HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
 ];
 
-async function optimizeImage(base64: string, maxWidth = 1024): Promise<string> {
+async function optimizeImage(base64: string, maxWidth = 768): Promise<string> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.src = base64;
@@ -30,7 +30,7 @@ async function optimizeImage(base64: string, maxWidth = 1024): Promise<string> {
       ctx.fillStyle = "white";
       ctx.fillRect(0, 0, width, height);
       ctx.drawImage(img, 0, 0, width, height);
-      resolve(canvas.toDataURL('image/jpeg', 0.9));
+      resolve(canvas.toDataURL('image/jpeg', 0.8));
     };
     img.onerror = () => reject(new Error("Bildverarbeitung fehlgeschlagen."));
   });
@@ -50,13 +50,14 @@ function getAI() {
 
 export async function performVirtualTryOn(userBase64: string, productBase64: string, productName: string): Promise<{ image: string, size: string }> {
   const [optUser, optProduct] = await Promise.all([
-    optimizeImage(userBase64, 1024),
-    optimizeImage(productBase64, 1024)
+    optimizeImage(userBase64, 768),
+    optimizeImage(productBase64, 768)
   ]);
 
   const ai = getAI();
-  try {
-    const response = await ai.models.generateContent({
+  
+  const makeRequest = async () => {
+    return await ai.models.generateContent({
       model: APP_CONFIG.IMAGE_MODEL,
       contents: {
         parts: [
@@ -86,6 +87,28 @@ export async function performVirtualTryOn(userBase64: string, productBase64: str
         safetySettings: SAFETY_SETTINGS
       }
     });
+  };
+
+  try {
+    let response;
+    let retries = 0;
+    const maxRetries = 2;
+    
+    while (retries <= maxRetries) {
+      try {
+        response = await makeRequest();
+        break;
+      } catch (err: any) {
+        if ((err.message?.includes("429") || err.message?.includes("RESOURCE_EXHAUSTED")) && retries < maxRetries) {
+          retries++;
+          await new Promise(resolve => setTimeout(resolve, retries * 2000));
+          continue;
+        }
+        throw err;
+      }
+    }
+
+    if (!response) throw new Error("Keine Antwort von der KI.");
 
     const candidates = response.candidates;
     if (!candidates || candidates.length === 0) {
