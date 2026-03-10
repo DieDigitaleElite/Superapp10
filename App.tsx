@@ -128,6 +128,7 @@ const App: React.FC = () => {
               <div className="flex flex-col items-center justify-center py-20">
                 <div className="w-12 h-12 md:w-16 md:h-16 border-4 border-indigo-50 border-t-indigo-600 rounded-full animate-spin mb-6"></div>
                 <h2 className="text-xl md:text-2xl font-black text-indigo-600 italic uppercase px-4 text-center">KI generiert Look...</h2>
+                <p className="text-slate-400 text-xs mt-4 animate-pulse">Dies kann bis zu 30 Sekunden dauern, bitte bleib dran! ✨</p>
               </div>
             ) : state.error ? (
               <div className="bg-white rounded-[32px] p-8 text-center shadow-xl max-w-lg mx-auto border border-red-50">

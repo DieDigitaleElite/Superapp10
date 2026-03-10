@@ -93,7 +93,7 @@ export async function performVirtualTryOn(userBase64: string, productBase64: str
       } catch (err: any) {
         if ((err.message?.includes("429") || err.message?.includes("RESOURCE_EXHAUSTED")) && retries < maxRetries) {
           retries++;
-          await new Promise(resolve => setTimeout(resolve, 1000)); // Reduced wait to 1s
+          await new Promise(resolve => setTimeout(resolve, retries * 3000)); // Wait 3s, then 6s
           continue;
         }
         throw err;
