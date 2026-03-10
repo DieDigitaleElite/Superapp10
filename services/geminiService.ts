@@ -10,7 +10,7 @@ const SAFETY_SETTINGS = [
   { category: HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
 ];
 
-async function optimizeImage(base64: string, maxWidth = 1024): Promise<string> {
+async function optimizeImage(base64: string, maxWidth = 512): Promise<string> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.src = base64;
@@ -30,7 +30,7 @@ async function optimizeImage(base64: string, maxWidth = 1024): Promise<string> {
       ctx.fillStyle = "white";
       ctx.fillRect(0, 0, width, height);
       ctx.drawImage(img, 0, 0, width, height);
-      resolve(canvas.toDataURL('image/jpeg', 0.9));
+      resolve(canvas.toDataURL('image/jpeg', 0.8));
     };
     img.onerror = () => reject(new Error("Bildverarbeitung fehlgeschlagen."));
   });
@@ -50,8 +50,8 @@ function getAI() {
 
 export async function performVirtualTryOn(userBase64: string, productBase64: string, productName: string): Promise<{ image: string, size: string }> {
   const [optUser, optProduct] = await Promise.all([
-    optimizeImage(userBase64, 1024),
-    optimizeImage(productBase64, 1024)
+    optimizeImage(userBase64, 512),
+    optimizeImage(productBase64, 512)
   ]);
 
   const ai = getAI();
@@ -61,20 +61,19 @@ export async function performVirtualTryOn(userBase64: string, productBase64: str
       model: APP_CONFIG.IMAGE_MODEL,
       contents: {
         parts: [
-          { text: `HIGH-FIDELITY VIRTUAL TRY-ON:
-          - Dress person in IMAGE 1 with the EXACT outfit from IMAGE 2 (${productName}).
-          - Maintain 100% identity of the person (face, hair, skin, pose).
-          - Ensure seamless integration and realistic fabric texture.
-          - Suggest the best size (XS, S, M, L, XL, XXL) based on body type.
-          - Output: High-quality Image + Size (e.g. "Size: M").` },
+          { text: `VIRTUAL TRY-ON:
+          - Dress person in IMAGE 1 with outfit from IMAGE 2 (${productName}).
+          - Keep person's face, hair, and pose identical.
+          - Replace sleeves to match IMAGE 2.
+          - Suggest best size (XS, S, M, L, XL, XXL).
+          - Output: Image + Size (e.g. "Size: M").` },
           { inlineData: { data: getCleanBase64(optUser), mimeType: "image/jpeg" } },
           { inlineData: { data: getCleanBase64(optProduct), mimeType: "image/jpeg" } },
         ],
       },
       config: { 
         imageConfig: { 
-          aspectRatio: "3:4",
-          imageSize: "1K"
+          aspectRatio: "3:4"
         },
         safetySettings: SAFETY_SETTINGS
       }
