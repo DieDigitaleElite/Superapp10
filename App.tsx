@@ -2,7 +2,7 @@
 import React, { useState, useCallback } from 'react';
 import { Product, TryOnState } from './types';
 import { MOCK_PRODUCTS, AVAILABLE_SIZES } from './constants';
-import { performVirtualTryOn, fileToBase64, urlToBase64, estimateSizeFromImage } from './services/geminiService';
+import { performVirtualTryOn, fileToBase64, urlToBase64 } from './services/geminiService';
 import ProductCard from './components/ProductCard';
 import StepIndicator from './components/StepIndicator';
 
@@ -37,12 +37,14 @@ const App: React.FC = () => {
 
     try {
       const productBase64 = await urlToBase64(state.selectedProduct.imageUrl);
-      const size = await estimateSizeFromImage(state.userImage, state.selectedProduct.name);
-      const image = await performVirtualTryOn(state.userImage, productBase64, state.selectedProduct.name);
+      const { image, size } = await performVirtualTryOn(state.userImage, productBase64, state.selectedProduct.name);
       setState(prev => ({ ...prev, resultImage: image, recommendedSize: size, isLoading: false }));
     } catch (err: any) {
       console.error(err);
-      const errorMessage = err.message || "KI-Fehler. Bitte versuche ein anderes Foto.";
+      let errorMessage = err.message || "KI-Fehler. Bitte versuche ein anderes Foto.";
+      if (err.message === "QUOTA_EXHAUSTED" || err.message?.includes("API-Limit")) {
+        errorMessage = "Das API-Limit wurde erreicht. Bitte versuche es in ein paar Minuten erneut.";
+      }
       setState(prev => ({ ...prev, isLoading: false, error: errorMessage }));
     }
   };

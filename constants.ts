@@ -31,6 +31,5 @@ export const MOCK_PRODUCTS: Product[] = [
 export const AVAILABLE_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
 
 export const APP_CONFIG = {
-  TEXT_MODEL: 'gemini-3-flash-preview',
   IMAGE_MODEL: 'gemini-2.5-flash-image',
 };
