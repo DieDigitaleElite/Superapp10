@@ -61,23 +61,12 @@ export async function performVirtualTryOn(userBase64: string, productBase64: str
       model: APP_CONFIG.IMAGE_MODEL,
       contents: {
         parts: [
-          { text: `STRICT FASHION VIRTUAL TRY-ON & SIZE ANALYSIS:
-          1. TARGET: Person in IMAGE 1.
-          2. SOURCE OUTFIT: Exact garment(s) shown in IMAGE 2 (${productName}).
-          
-          TASK A (IMAGE GENERATION):
-          - Dress the person in IMAGE 1 with the COMPLETE outfit from IMAGE 2.
-          - IDENTICAL DESIGN: Apply the EXACT design, cut, and garment type. 
-          - SLEEVE REPLACEMENT: Replace original sleeves with the style from IMAGE 2.
-          - NO STYLE CHANGES: No extra skirts or silhouette changes.
-          - PIXEL PERFECT COLORS: Use exact colors and patterns.
-          - PRESERVE PERSON: Keep face, hair, skin, pose, and background 100% identical.
-          - NO CROPPING: Keep the full frame.
-          
-          TASK B (SIZE ANALYSIS):
-          - Analyze the person's body type and suggest the best size (XS, S, M, L, XL, XXL) for this product.
-          
-          OUTPUT: Return the generated image AND the recommended size code (e.g. "Size: M").` },
+          { text: `VIRTUAL TRY-ON:
+          - Dress person in IMAGE 1 with outfit from IMAGE 2 (${productName}).
+          - Keep person's face, hair, and pose identical.
+          - Replace sleeves to match IMAGE 2.
+          - Suggest best size (XS, S, M, L, XL, XXL).
+          - Output: Image + Size (e.g. "Size: M").` },
           { inlineData: { data: getCleanBase64(optUser), mimeType: "image/jpeg" } },
           { inlineData: { data: getCleanBase64(optProduct), mimeType: "image/jpeg" } },
         ],
@@ -104,7 +93,7 @@ export async function performVirtualTryOn(userBase64: string, productBase64: str
       } catch (err: any) {
         if ((err.message?.includes("429") || err.message?.includes("RESOURCE_EXHAUSTED")) && retries < maxRetries) {
           retries++;
-          await new Promise(resolve => setTimeout(resolve, retries * 2000));
+          await new Promise(resolve => setTimeout(resolve, 1000)); // Reduced wait to 1s
           continue;
         }
         throw err;
