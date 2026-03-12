@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Product, TryOnState } from './types';
 import { MOCK_PRODUCTS, AVAILABLE_SIZES } from './constants';
 import { performVirtualTryOn, fileToBase64, urlToBase64 } from './services/geminiService';

@@ -10,7 +10,7 @@ const SAFETY_SETTINGS = [
   { category: HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
 ];
 
-async function optimizeImage(base64: string, maxWidth = 512): Promise<string> {
+async function optimizeImage(base64: string, maxWidth = 1024): Promise<string> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.src = base64;
@@ -30,7 +30,7 @@ async function optimizeImage(base64: string, maxWidth = 512): Promise<string> {
       ctx.fillStyle = "white";
       ctx.fillRect(0, 0, width, height);
       ctx.drawImage(img, 0, 0, width, height);
-      resolve(canvas.toDataURL('image/jpeg', 0.8));
+      resolve(canvas.toDataURL('image/jpeg', 0.9));
     };
     img.onerror = () => reject(new Error("Bildverarbeitung fehlgeschlagen."));
   });
@@ -41,7 +41,8 @@ function getCleanBase64(dataUrl: string): string {
 }
 
 function getAI() {
-  const apiKey = process.env.GEMINI_API_KEY;
+  // Use API_KEY (injected via key selection dialog) or GEMINI_API_KEY (default)
+  const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
   if (!apiKey || apiKey === "undefined") {
     throw new Error("INVALID_KEY");
   }
@@ -50,8 +51,8 @@ function getAI() {
 
 export async function performVirtualTryOn(userBase64: string, productBase64: string, productName: string): Promise<{ image: string, size: string }> {
   const [optUser, optProduct] = await Promise.all([
-    optimizeImage(userBase64, 512),
-    optimizeImage(productBase64, 512)
+    optimizeImage(userBase64, 768),
+    optimizeImage(productBase64, 768)
   ]);
 
   const ai = getAI();
