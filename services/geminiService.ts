@@ -62,21 +62,12 @@ export async function performVirtualTryOn(userBase64: string, productBase64: str
       model: APP_CONFIG.IMAGE_MODEL,
       contents: {
         parts: [
-          { text: `VIRTUAL TRY-ON INSTRUCTIONS:
-          - IMAGE 1: The person who wants to try on the clothes.
-          - IMAGE 2: The exact product (${productName}) to be worn.
-          
-          TASK:
-          1. COMPLETELY REPLACE the person's current outfit in IMAGE 1 with the FULL SET from IMAGE 2.
-          2. REMOVE ALL traces of the original clothing, including sleeves, collars, and layers.
-          3. The new clothing must be an ABSOLUTELY DETAIL-FAITHFUL and pixel-perfect representation of IMAGE 2 (colors, patterns, textures).
-          4. DO NOT CHANGE the person's face, hair, skin tone, or identity. The face must remain 100% identical to IMAGE 1.
-          5. Maintain the person's pose and the background from IMAGE 1.
-          6. Suggest the best size (XS, S, M, L, XL, XXL) based on the person's build.
-          
-          OUTPUT:
-          - One Image part (the result).
-          - One Text part with the size (e.g., "Size: M").` },
+          { text: `VIRTUAL TRY-ON:
+          - Dress person in IMAGE 1 with outfit from IMAGE 2 (${productName}).
+          - Keep person's face, hair, and pose identical.
+          - Replace sleeves to match IMAGE 2.
+          - Suggest best size (XS, S, M, L, XL, XXL).
+          - Output: Image + Size (e.g. "Size: M").` },
           { inlineData: { data: getCleanBase64(optUser), mimeType: "image/jpeg" } },
           { inlineData: { data: getCleanBase64(optProduct), mimeType: "image/jpeg" } },
         ],
